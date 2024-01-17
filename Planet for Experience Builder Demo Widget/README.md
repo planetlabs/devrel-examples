@@ -14,7 +14,7 @@ It that allows for a user to search for and visualize imagery stored in a Sentin
 
 Below is a screenshot of what the widget looks like when used in Experience Builder.
 
-![A screenshot of the widget.](widget-screenshot.png)
+![A screenshot of the widget.](widget_screenshot.png)
 
 ## Set up instructions
 
