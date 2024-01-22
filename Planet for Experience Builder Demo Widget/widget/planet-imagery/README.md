@@ -4,7 +4,7 @@ This is a sample Experience build widget that shows how to integrate imagery fro
 
 This widget is powered by the [Sentinel Hub](https://sentinel-hub.com/) APIs and requires that you have both a Planet and Sentinel Hub account.  
 
-It that allows for a user to search for and visualize imagery stored in a Sentinel Hub collection directly from within ArcGIS Experience Builder so that Planet imagery can be used in GIS workflows without needing to download any data.
+It allows for a user to search for and visualize imagery stored in a Sentinel Hub collection directly from within ArcGIS Experience Builder so that Planet imagery can be used in GIS workflows without needing to download any data.
 
 ## How does it work?
 
