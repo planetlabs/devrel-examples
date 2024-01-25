@@ -19,11 +19,10 @@ Below is a screenshot of what the widget looks like when used in Experience Buil
 ## Set up instructions
 
 1. Install and set up the [ArcGIS Experience Builder SDK](https://developers.arcgis.com/experience-builder/).
-2. Clone this repository.
-3. Copy the contents of the `widget` folder into your ArcGIS Experience Builder `client` folder ([see documentation for more details](https://developers.arcgis.com/experience-builder/guide/getting-started-widget/)).
-4. Go to your [Sentinel Hub dashboard](https://apps.sentinel-hub.com/dashboard/#/) and create an OAuth client.  Add the client ID and client secret to the widget `config.json` file.
-5. Create a Sentinel Hub collection and [populate it with data](https://docs.sentinel-hub.com/api/latest/api/data-import/).  Also create a configuration with the appropriate layers for different band combinations or indices.
-6. Please refer to Esri documentation for deploying widgets, such as to ArcGIS Enterprise by following these instructions  on [deploying widgets in ArcGIS Enterprise](https://doc.arcgis.com/en/experience-builder/11.0/configure-widgets/add-custom-widgets.htm).
+2. Clone the sample repo and copy this widget's folder (within widgets) to the client/your-extensions/widgets folder of your Experience Builder installation. ([see documentation for more details](https://developers.arcgis.com/experience-builder/guide/getting-started-widget/)).
+3. Go to your [Sentinel Hub dashboard](https://apps.sentinel-hub.com/dashboard/#/) and create an OAuth client.  Add the client ID and client secret to the widget `config.json` file.
+4. Create a Sentinel Hub collection and [populate it with data](https://docs.sentinel-hub.com/api/latest/api/data-import/).  Also create a configuration with the appropriate layers for different band combinations or indices.
+5. Please refer to Esri documentation for deploying widgets, such as to ArcGIS Enterprise by following these instructions  on [deploying widgets in ArcGIS Enterprise](https://doc.arcgis.com/en/experience-builder/11.0/configure-widgets/add-custom-widgets.htm).
 
 
 ## Security Considerations
