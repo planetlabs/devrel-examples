@@ -18,11 +18,12 @@ Below is a screenshot of what the widget looks like when used in Experience Buil
 
 ## Set up instructions
 
-1. Install and set up the [ArcGIS Experience Builder SDK](https://developers.arcgis.com/experience-builder/).
-2. Clone the sample repo and copy this widget's folder (within widgets) to the client/your-extensions/widgets folder of your Experience Builder installation. ([see documentation for more details](https://developers.arcgis.com/experience-builder/guide/getting-started-widget/)).
-3. Go to your [Sentinel Hub dashboard](https://apps.sentinel-hub.com/dashboard/#/) and create an OAuth client.  Add the client ID and client secret to the widget `config.json` file.
-4. Create a Sentinel Hub collection and [populate it with data](https://docs.sentinel-hub.com/api/latest/api/data-import/).  Also create a configuration with the appropriate layers for different band combinations or indices.
-5. Please refer to Esri documentation for deploying widgets, such as to ArcGIS Enterprise by following these instructions  on [deploying widgets in ArcGIS Enterprise](https://doc.arcgis.com/en/experience-builder/11.0/configure-widgets/add-custom-widgets.htm).
+1. Install and set up the [ArcGIS Experience Builder SDK](https://developers.arcgis.com/experience-builder/guide/install-guide/).
+2. Clone the sample repo and copy the contents of the widget folder (the folder called planet-imagery) to the `client/your-extensions/widgets` folder of your Experience Builder installation. ([see documentation for more details](https://developers.arcgis.com/experience-builder/guide/getting-started-widget/)).
+3. Go to your [Sentinel Hub dashboard](https://apps.sentinel-hub.com/dashboard/#/) and create an OAuth client.  Add the client ID and client secret to the widget `config.json` file. Ensure you specify allowed origins for the server where the app will be hosted and for your localhost development environment.
+4. Create a Sentinel Hub collection and [populate it with data](https://docs.sentinel-hub.com/api/latest/api/data-import/).  Also create a configuration with the appropriate layers for different band combinations or indices.  Add the collection ID and configuration ID to the widget `config.json` file.
+5. This widget relies on a few additional dependencies that must be added to the `package.json` file. In the `client` folder, open `package.json` and find the `dependencies` block.  Add the following dependencies: `"@mui/material": "5.15.15", "@mui/x-date-pickers": "7.3.1", "@date-io/date-fns": "^2.14.0", "date-fns": "^2.28.0",`
+6. Please refer to Esri documentation for deploying widgets, such as with [automated deployments](https://developers.arcgis.com/experience-builder/guide/deployment-topics/#automated-deployments), by downloading [from the Developer Edition](https://developers.arcgis.com/experience-builder/guide/deployment-topics/#download-the-experience), or by [deploying widgets in ArcGIS Enterprise](https://doc.arcgis.com/en/experience-builder/11.0/configure-widgets/add-custom-widgets.htm).
 
 
 ## Security Considerations
