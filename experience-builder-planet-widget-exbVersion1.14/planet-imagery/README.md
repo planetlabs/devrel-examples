@@ -1,13 +1,6 @@
-# Planet Experience Builder Demo Widget
+# Planet for ArcGIS Experience Builder Widget
 
-This is a sample Experience build widget that shows how to integrate imagery from Planet APIs with ArcGIS.
+Browse and visualize [Planet](https://planet.com) imagery from within ArcGIS Experience Builder.
 
-This widget is powered by the [Sentinel Hub](https://sentinel-hub.com/) APIs and requires that you have both a Planet and Sentinel Hub account.  
-
-It allows for a user to search for and visualize imagery stored in a Sentinel Hub collection directly from within ArcGIS Experience Builder so that Planet imagery can be used in GIS workflows without needing to download any data.
-
-## How does it work?
-
-- Select from different imagery renderers - users can select from different layers that determine how imagery is rendered. Layers are defined in Sentinel Hub Configurations.
-- See what dates imagery is available for - a calendar can be used to search for dates that can be selected to display on the map
-- Stream imagery as OGC services - this code sample uses the Sentinel Hub OGC API to stream the map services in this widget from the Sentinel Hub cloud-based APIs
+- Search for imagery stored in Sentinel Hub Collections using the map extent and calendar. Uses the Sentinel Hub Catalog API based on STAC.
+- Visualize imagery on the map by selecting from different layers as defined in Sentinel Hub Configurations. Uses the Sentinel Hub OGC API to stream WMTS services.
