@@ -1,7 +1,7 @@
 {
-    "clientID" : "insert clientID",
-    "clientSecret" : "insert clientSecret",
-    "collectionID" : "insert collectionID",
-    "configurationID" : "insert configurationID"
-  }
-  
+  "credentials": {
+    "client_id": "",
+    "client_secret": ""
+  },
+  "sentinelHubConfiguration": {}
+}

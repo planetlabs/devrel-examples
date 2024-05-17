@@ -1,19 +1,19 @@
-import { React } from 'jimu-core'
-import { DatePicker, LocalizationProvider, PickersDay} from '@mui/x-date-pickers';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
+import { React } from 'jimu-core';
+import { DatePicker, LocalizationProvider, PickersDay, PickersDayProps } from '@mui/x-date-pickers';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import esriRequest from 'esri/request';
 import { useState, useEffect } from 'react';
-import { format  } from 'date-fns';
+import { format } from 'date-fns';
 
-  /**
+/**
  *  Searches the Sentinel Hub catalog API for a given extent and month 
  *  @param monthStart the first date of the month currently in the calendar view
  *  @param extent Current map extent
  *  @param accessToken Sentinel Hub access token 
  *  @param collectionID Sentinel Hub Collection ID as supplied in the widget configuration 
- *  @returns {object} An object that contains the list of dates with available data
+ *  @returns {Promise<string[]>} An object that contains the list of dates with available data
  */
-async function getAvailableDates(monthStart, extent, accessToken, collectionID) {
+async function getAvailableDates(monthStart: Date, extent: any, accessToken: string, collectionID: string): Promise<string[]> {
     const endpoint = "https://services.sentinel-hub.com/api/v1/catalog/1.0.0/search";
     
     const monthEnd = new Date(monthStart);
@@ -32,19 +32,19 @@ async function getAvailableDates(monthStart, extent, accessToken, collectionID) 
     };
 
     const options = {
-        method: "post",
+        method: "post" as const,
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${accessToken}`
         },
-        responseType: "json",
+        responseType: "json" as const,
         body: JSON.stringify(payload)
     };
 
     try {
         const response = await esriRequest(endpoint, options);
-        const timestamps = response.data.features.map(feature => feature.properties.datetime);
-        const uniqueDates = [...new Set(timestamps.map(timestamp => timestamp.split('T')[0]))];
+        const timestamps: string[] = response.data.features.map((feature: any) => feature.properties.datetime);
+        const uniqueDates: string[] = [...new Set(timestamps.map((timestamp: string) => timestamp.split('T')[0]))];
         return uniqueDates;
     } catch (error) {
         console.error('Error fetching dates:', error);
@@ -52,27 +52,52 @@ async function getAvailableDates(monthStart, extent, accessToken, collectionID) 
     }
 }
 
+interface DateSelectorProps {
+    selectedDate: Date | null;
+    accessToken: string;
+    handleDateChange: (date: Date | null) => void;
+    collectionID: string;
+    getMapExtent: (wkid: number) => any;
+}
 
-/**
-*  Component that allows the user to select a date to display on the map 
-*  @param selectedDate The actively selected date or null state
-*  @param accessToken Sentinel Hub access token 
-*  @param collectionID Sentinel Hub Collection ID as supplied in the widget configuration
-*  @param handleDateChange Function to update the map and states for user date selection
-*  @param getMapExtent function to get the current map extent to use for searching
-*/
-const DateSelector = ({selectedDate, accessToken, handleDateChange, collectionID, getMapExtent }) => {
+interface CustomDayProps extends PickersDayProps<Date> {
+    availableDates: string[];
+    selectedDate: Date | null;
+}
 
-    const [availableDates, setAvailableDates] = useState([]);
+const CustomDay: React.FC<CustomDayProps> = (props) => {
+    const { day, availableDates, selectedDate, ...other } = props;
+    const dateStr = format(day, "yyyy-MM-dd");
+    const isSelected = availableDates.includes(dateStr);
+    const dayStyles = {
+        backgroundColor: isSelected ? "#b3e5fc" : "inherit",
+        borderRadius: "50%",
+        width: "36px",
+        height: "36px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center"
+    };
 
+    return (
+        <PickersDay
+            {...other}
+            day={day}
+            selected={isSelected || (selectedDate && day.getTime() === selectedDate.getTime())}
+            style={dayStyles}
+        />
+    );
+};
+
+const DateSelector: React.FC<DateSelectorProps> = ({ selectedDate, accessToken, handleDateChange, collectionID, getMapExtent }) => {
+    const [availableDates, setAvailableDates] = useState<string[]>([]);
     const startDate = new Date();
     
-    // When colllectionID and accessToken are available, get the extent and current month and search for available data
+    // When collectionID and accessToken are available, get the extent and current month and search for available data
     useEffect(() => {
-
-        const mapExtent = getMapExtent();
+        const mapExtent = getMapExtent(4326);
         if (!mapExtent) {
-            console.error("Unable to determine map extent")
+            console.error("Unable to determine map extent");
             return;
         }
 
@@ -88,13 +113,11 @@ const DateSelector = ({selectedDate, accessToken, handleDateChange, collectionID
                 setAvailableDates(dates);
             });
         }
-
-
     }, [accessToken, collectionID]);
 
-    // function to search for new dates when the user changes the date picker month
-    const handleMonthChange = (date) => {
-        const mapExtent = getMapExtent();
+    // Function to search for new dates when the user changes the date picker month
+    const handleMonthChange = (date: Date) => {
+        const mapExtent = getMapExtent(4326);
         if (!mapExtent) {
             return;
         }
@@ -106,52 +129,26 @@ const DateSelector = ({selectedDate, accessToken, handleDateChange, collectionID
         getAvailableDates(monthStart, mapExtent, accessToken, collectionID).then(dates => {
             setAvailableDates(dates);
         });
-    }
-
-    // Custom renderer for dates where data is available
-    function CustomDay({ selectedDay, availableDates, ...other }) {
-        const dateStr = format(other.day, "yyyy-MM-dd");
-        const isSelected = availableDates.includes(dateStr);
-        const dayStyles = {
-            backgroundColor: isSelected ? "#b3e5fc" : "inherit",
-            borderRadius: "50%",
-            width: "36px",
-            height: "36px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center"
-        };
-        return (
-            <PickersDay {...other} style={dayStyles} />
-        );
-    }
-
+    };
 
     return (
         <LocalizationProvider dateAdapter={AdapterDateFns}>
             <div>
-                <div>
-                    <DatePicker
-                        label="Date"
-                        onChange={(newDate) => handleDateChange(newDate)}
-                        value={selectedDate}
-                        onMonthChange={handleMonthChange}
-                        slots={{ day: CustomDay }}
-                        slotProps={{
-                            textField: {
-                                helperText: 'Select a date to view data',
-                            },
-                            day: {
-                                selectedDay: startDate,
-                                availableDates: availableDates
-                            }
-                        }}
-                    />
-                </div>
+                <DatePicker
+                    label="Date"
+                    onChange={(newDate) => handleDateChange(newDate)}
+                    value={selectedDate}
+                    onMonthChange={handleMonthChange}
+                    slots={{ day: (dayProps) => <CustomDay {...dayProps} availableDates={availableDates} selectedDate={selectedDate} /> }}  // Use slots to pass CustomDay with availableDates and selectedDate
+                    slotProps={{
+                        textField: {
+                            helperText: 'Select a date to view data',
+                        }
+                    }}
+                />
             </div>
         </LocalizationProvider>
     );
 };
 
-
-export default DateSelector
+export default DateSelector;

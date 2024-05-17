@@ -13,6 +13,7 @@ import SpatialReference from 'esri/geometry/SpatialReference';
 // Components
 import DateSelector from './dateSelector';
 import LayerSelector from './layerSelector';
+import SaveWMTS from './saveWMTS/saveWMTS';
 
 
 interface State {
@@ -26,7 +27,21 @@ interface State {
   configurationExtent: __esri.Extent;
 }
 
-export default class Widget extends React.PureComponent<AllWidgetProps<unknown>, State> {
+interface WidgetConfig {
+  configurationID: string;
+  collectionID: string;
+  credentials: {
+    clientID: string;
+    clientSecret: string;
+  };
+  sentinelHubConfiguration: {
+    collection_id: string;
+    configuration_id: string;
+  }
+}
+
+
+export default class Widget extends React.PureComponent<AllWidgetProps<any>, State, WidgetConfig> {
   tokenRefreshInterval: NodeJS.Timeout | null = null;
   WMTSLayer: typeof __esri.WMTSLayer;
   jimuMapView: JimuMapView;
@@ -71,10 +86,8 @@ export default class Widget extends React.PureComponent<AllWidgetProps<unknown>,
   }
 
   fetchAndSetToken = async () => {
-    const credentials = {
-      client_id: this.props.config.clientID,
-      client_secret: this.props.config.clientSecret
-    };
+
+    const credentials = this.props.config.credentials;
 
     try {
       const token = await fetchToken(credentials);
@@ -98,7 +111,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<unknown>,
 
   };
 
-  handleDateChange = (newDate) => {  
+  handleDateChange = (newDate) => {
 
     if (newDate) {
       const isoString = newDate.toISOString().split('T')[0];
@@ -114,13 +127,13 @@ export default class Widget extends React.PureComponent<AllWidgetProps<unknown>,
       this.setState({ selectedDate: null });
     }
   };
-  
+
 
   // Set the map extent to match the configuration extent
   fetchAndSetConfigurationExtent = async (token) => {
-    if (token && this.props.config.configurationID) {
+    if (token && this.props.config.sentinelHubConfiguration) {
       try {
-        const configurationExtent = await getSHConfigExtent(this.props.config.configurationID);
+        const configurationExtent = await getSHConfigExtent(this.props.config.sentinelHubConfiguration.configuration_id);
         this.setState({ configurationExtent: configurationExtent });
 
         if (this.jimuMapView && this.jimuMapView.view) {
@@ -141,7 +154,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<unknown>,
     const Layer = inLayer;
 
     const baseUrl = "https://services.sentinel-hub.com/ogc/wmts";
-    const configuration_id = this.props.config.configurationID;
+    const configuration_id = this.props.config.sentinelHubConfiguration.configuration_id;
     const wmtsUrl = `${baseUrl}/${configuration_id}`
 
     const customParams = {
@@ -154,11 +167,11 @@ export default class Widget extends React.PureComponent<AllWidgetProps<unknown>,
       url: wmtsUrl,
       customLayerParameters: customParams
     });
-
     return layer;
   };
 
   addWMTSLayer = (layer: __esri.WMTSLayer) => {
+
     if (!this.jimuMapView) {
       console.error("Can't add WMTS Layer - Map view is not available");
       return;
@@ -172,7 +185,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<unknown>,
     // Reset the wmtsLayers array in the state
     this.setState({ wmtsLayers: [] });
 
-    this.jimuMapView.view.map.add(layer);
+    this.jimuMapView.view.map.add(layer, 0);
 
     // Add the new layer to the wmtsLayers array in the state
     this.setState(state => ({
@@ -180,12 +193,42 @@ export default class Widget extends React.PureComponent<AllWidgetProps<unknown>,
     }));
   };
 
-
-  getMapExtent = () => {
+  getMapExtent = (wkid?: number) => {
     const extent = this.jimuMapView.view.extent;
-    const outSpatialReference = new SpatialReference({ wkid: 4326 });
-    const projectedExtent = projection.project(extent, outSpatialReference);
-    return projectedExtent;
+    if (wkid) {
+      const outSpatialReference = new SpatialReference({ wkid: wkid });
+      const projectedExtent = projection.project(extent, outSpatialReference);
+      return projectedExtent;
+    } else {
+      return extent;
+    }
+  }
+
+
+  // getMapExtent = () => {
+  //   const extent = this.jimuMapView.view.extent;
+  //   const outSpatialReference = new SpatialReference({ wkid: 4326 });
+  //   const projectedExtent = projection.project(extent, outSpatialReference);
+  //   return projectedExtent;
+  // }
+
+  getMapExtent102100 = () => {
+    const extent = this.jimuMapView.view.extent;
+    return extent;
+  }
+
+  getEsriCredentials = () => {
+    const token = this.props.token;
+    const portalUrl = this.props.portalUrl;
+    const user = this.props.user;
+    const savePermission = this.props.user.privileges.includes("portal:user:createItem")
+
+    return {
+      token: token,
+      portalUrl: portalUrl,
+      user: user,
+      savePermission: savePermission
+    }
   }
 
   onActiveViewChange = (jimuMapView: JimuMapView) => {
@@ -211,7 +254,7 @@ export default class Widget extends React.PureComponent<AllWidgetProps<unknown>,
           <LayerSelector
             selectedLayer={this.state.selectedLayer}
             accessToken={this.state.accessToken}
-            configurationID={this.props.config.configurationID}
+            configurationID={this.props.config.sentinelHubConfiguration.configuration_id}
             onLayerChange={this.handleLayerChange}
           />
           <Button
@@ -228,10 +271,22 @@ export default class Widget extends React.PureComponent<AllWidgetProps<unknown>,
             selectedDate={this.state.selectedDate}
             accessToken={this.state.accessToken}
             handleDateChange={this.handleDateChange}
-            collectionID={this.props.config.collectionID}
-            getMapExtent = {this.getMapExtent}
+            collectionID={this.props.config.sentinelHubConfiguration.collection_id}
+            getMapExtent={this.getMapExtent}
           />
         </div>
+        {this.getEsriCredentials().savePermission && (
+          <div>
+            <SaveWMTS
+              selectedDate={this.state.selectedDate}
+              selectedLayer={this.state.selectedLayer}
+              getMapExtent={this.getMapExtent}
+              configurationID={this.props.config.sentinelHubConfiguration.configuration_id}
+              wmtsLayers={this.state.wmtsLayers}
+              getEsriCredentials={this.getEsriCredentials}
+            />
+          </div>
+        )}
       </div>
     )
   }

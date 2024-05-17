@@ -1,0 +1,5 @@
+# Ignoring creds.json in all folders
+**/creds.json
+
+# Environment variables
+.env
