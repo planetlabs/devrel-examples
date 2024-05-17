@@ -81,4 +81,42 @@ const fetchToken = async (credentials) => {
   }
 };
 
-export { getSHConfigExtent, fetchToken };
+//converts units meters to degrees at a given latitidue/longitude as determined by an input polygon
+function metersToDegrees(selectedFeature, meters) {
+
+    const coords = selectedFeature.geometry.coordinates[0];
+    
+    // Extract and sort the latitudes from the coordinates
+    const lats = coords.map(coord => coord[1]).sort((a, b) => a - b);
+
+    let medianLat;
+
+    // Calculate the median latitude
+    const midIndex = Math.floor(lats.length / 2);
+    if (lats.length % 2 === 0) {
+        medianLat = (lats[midIndex - 1] + lats[midIndex]) / 2;
+    } else {
+        medianLat = lats[midIndex];
+    }
+
+    // Convert median latitude to radians
+    const medianLatRadians = medianLat * Math.PI / 180;
+
+    // Calculate the length of a degree of longitude at this latitude
+    const lengthOfDegree = 111412.84 * Math.cos(medianLatRadians) - 93.5 * Math.cos(3*medianLatRadians) + 0.118 * Math.cos(5*medianLatRadians);
+
+    // Convert 3 meters to degrees
+    const resLat = meters / 111319; // for latitude
+    const resLon = meters / lengthOfDegree; // for longitude at median latitude
+
+    return {
+        resy: resLat,
+        resx: resLon
+    };
+}
+
+
+
+
+
+export { getSHConfigExtent, fetchToken, metersToDegrees };

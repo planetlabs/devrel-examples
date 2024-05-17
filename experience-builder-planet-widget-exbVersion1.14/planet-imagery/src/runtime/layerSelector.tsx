@@ -26,8 +26,8 @@ const getLayers = async (accessToken, configurationID) => {
   const url = `https://services.sentinel-hub.com/configuration/v1/wms/instances/${configurationID}/layers`;
 
   const options = {
-    responseType: "json",
-    method: "auto",
+    responseType: "json" as const,
+    method: "auto" as const,
     headers: {
       'Authorization': `Bearer ${accessToken}`
     }
@@ -60,7 +60,6 @@ function LayerSelector({ selectedLayer, accessToken, configurationID, onLayerCha
     const fetchLayers = async () => {
       if (accessToken && configurationID) {
         try {
-          console.log("useEffect", layers)
           const layersData = await getLayers(accessToken, configurationID);
           setLayers(layersData);
         } catch (error) {
