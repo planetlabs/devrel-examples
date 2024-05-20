@@ -42,7 +42,7 @@ async function getAvailableDates(monthStart: Date, extent: any, accessToken: str
     }
     const bbox = [extent_json.xmin, extent_json.ymin, extent_json.xmax, extent_json.ymax];
 
-    const payload = {
+    const basePayload = {
         "collections": [
             `byoc-${collectionID}`
         ],
@@ -58,13 +58,32 @@ async function getAvailableDates(monthStart: Date, extent: any, accessToken: str
             'Authorization': `Bearer ${accessToken}`
         },
         responseType: "json" as const,
-        body: JSON.stringify(payload)
+        body: ''
     };
 
+    let uniqueDates: string[] = [];
+    let next: number | undefined = undefined;
+
     try {
-        const response = await esriRequest(endpoint, options);
-        const timestamps: string[] = response.data.features.map((feature: any) => feature.properties.datetime);
-        const uniqueDates: string[] = [...new Set(timestamps.map((timestamp: string) => timestamp.split('T')[0]))];
+        while (true) {
+            const payload = { ...basePayload, next };
+            options.body = JSON.stringify(payload);
+
+            const response = await esriRequest(endpoint, options);
+            const timestamps: string[] = response.data.features.map((feature: any) => feature.properties.datetime);
+            uniqueDates.push(...timestamps.map((timestamp: string) => timestamp.split('T')[0]));
+
+            // Check if there is a next page
+            const context = response.data.context;
+            if (context && context.next) {
+                next = context.next;
+            } else {
+                break;
+            }
+        }
+
+        // Remove duplicates
+        uniqueDates = [...new Set(uniqueDates)];
         return uniqueDates;
     } catch (error) {
         console.error('Error fetching dates:', error);
