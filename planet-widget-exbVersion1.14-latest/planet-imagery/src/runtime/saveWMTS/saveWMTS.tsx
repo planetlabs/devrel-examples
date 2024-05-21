@@ -1,9 +1,9 @@
-// processImage.tsx
+// saveWMTS.tsx
 
 import { useState, useEffect } from 'react';
 import esriRequest from 'esri/request';
 import Button from '@mui/material/Button';
-import template from './templateWMTSDefinition.json'; // Adjust the path to your JSON file
+import template from './templateWMTSDefinition.json';
 import { React } from 'jimu-core'
 import TextField from '@mui/material/TextField';
 import Dialog from '@mui/material/Dialog';
@@ -30,10 +30,6 @@ const SaveWMTS: React.FC<SaveWMTSProps> = ({ selectedDate, selectedLayer, getMap
     const [validName, setValidName] = useState(null);
     const [itemId, setItemId] = useState(null);
     const [errorMessage, setErrorMessage] = useState(null);
-
-    useEffect(() => {
-        // Your useEffect logic here if needed
-    }, []);
 
     const checkLayerName = async (layerName, token, portalUrl, user) => {
         const baseUrl = `${portalUrl}/sharing/rest/search`;
@@ -153,7 +149,7 @@ const SaveWMTS: React.FC<SaveWMTSProps> = ({ selectedDate, selectedLayer, getMap
             const response = await esriRequest(url, options);
             if (response.data.success) {
                 return response
-                console.log('Item added successfully:', response.data);//return the response to the user
+                console.log('Item added successfully:', response.data);
             } else {
                 return response
                 console.error('Error adding item:', response.data.error.message);
@@ -166,7 +162,7 @@ const SaveWMTS: React.FC<SaveWMTSProps> = ({ selectedDate, selectedLayer, getMap
     const handleInputChange = (event) => {
         setName(event.target.value);
         if (validName === false) {
-            setValidName(null); // Clear the alert when the user changes the text
+            setValidName(null);
         }
     };
 

@@ -41,9 +41,9 @@ Select a map from your Experience.  This map is where imagery will be added to i
 
 Then you will need to enter a few details from Planet: a `Configuration ID`, a `Collection ID`, a `Client ID`, and a `Client Secret`.
 
-For the Client ID and Secret, you can go to your [Sentinel Hub dashboard](https://apps.sentinel-hub.com/dashboard/#/) and create an OAuth client. Ensure you specify allowed origins for the server where the app will be hosted and for your localhost development environment.
+For the `Client ID` and `Client Secret`, you can go to your [Sentinel Hub dashboard](https://apps.sentinel-hub.com/dashboard/#/) and create an OAuth client. Ensure you specify allowed origins for the server where the app will be hosted and for your localhost development environment.
 
-Create a Sentinel Hub collection and [populate it with data](https://docs.sentinel-hub.com/api/latest/api/data-import/).  Also create a configuration with the appropriate layers for different band combinations or indices.  Add the Collection ID and Configuration ID to the settings side panel.
+Create a Sentinel Hub collection and [populate it with data](https://docs.sentinel-hub.com/api/latest/api/data-import/).  Also create a configuration with the appropriate layers for different band combinations or indices.  Add the `Collection ID` and `Configuration ID` to the settings side panel.
 
 ### 3. Deployment
 
@@ -71,7 +71,11 @@ Find a bug or want to request a new feature? Please let us know by submitting an
 
 ### Version Compatibility
 
-The widget has been tested with ArcGIS Experience Builder version 1.14 with ArcGIS Online.  See [release versions](https://developers.arcgis.com/experience-builder/guide/release-versions/) for more details on compatible versions.
+The widget has been tested with ArcGIS Experience Builder version 1.14 with ArcGIS Online and ArcGIS Experience Builder version 1.10 with ArcGIS Online.
+
+There are two separate folders for versions that are compatible with ArcGIS Experience Builder 1.10 and 1.14 - use the version compatible with your ArcGIS environment.
+
+See [release versions](https://developers.arcgis.com/experience-builder/guide/release-versions/) for more details on compatible versions.
 
 ### Disclaimer
 This is provided as-is and is intended to be a code sample and not an official product. The APIs used in this widget are officially supported, though.
